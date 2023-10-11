@@ -4,10 +4,10 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import React from 'react';
 import Onboarding from 'react-native-onboarding-swiper';
-import Lottie from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { setItem } from '../utils/asyncStorage';
 
@@ -41,10 +41,9 @@ export default function OnboardingScreen() {
             backgroundColor: '#000000',
             image: (
               <View style={styles.lottie}>
-                <Lottie
-                  source={require('../assets/animations/device.json')}
-                  autoPlay
-                  loop
+                <Image
+                  source={require('../assets/animations/device_new.gif')}
+                  style={styles.lottie}
                 />
               </View>
             ),
@@ -56,10 +55,9 @@ export default function OnboardingScreen() {
             backgroundColor: '#000000',
             image: (
               <View style={styles.lottie}>
-                <Lottie
-                  source={require('../assets/animations/audio.json')}
-                  autoPlay
-                  loop
+                <Image
+                  source={require('../assets/animations/audio_new.gif')}
+                  style={styles.lottie}
                 />
               </View>
             ),
@@ -70,10 +68,9 @@ export default function OnboardingScreen() {
             backgroundColor: '#000000',
             image: (
               <View style={styles.lottie}>
-                <Lottie
-                  source={require('../assets/animations/data.json')}
-                  autoPlay
-                  loop
+                <Image
+                  source={require('../assets/animations/data_new.gif')}
+                  style={styles.lottie}
                 />
               </View>
             ),

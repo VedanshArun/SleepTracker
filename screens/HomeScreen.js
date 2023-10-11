@@ -5,11 +5,12 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { removeItem } from '../utils/asyncStorage';
-import wifi from 'react-native-android-wifi';
+import { Entypo } from '@expo/vector-icons';
+import { startActivityAsync, ActivityAction } from 'expo-intent-launcher';
 
 let { width, height } = Dimensions.get('window');
 
@@ -33,7 +34,12 @@ export default function HomeScreen() {
         <Text>Welcome to the dashboard</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            startActivityAsync(ActivityAction.WIFI_SETTINGS);
+          }}
+        >
           <Text style={styles.buttonText}>Connect To Device</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button}>
@@ -42,6 +48,8 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Download Data</Text>
         </TouchableOpacity>
+        <Entypo name="circle-with-cross" size={24} color="black" />
+        <Text>Device not connected!</Text>
       </View>
       <View>
         <Text style={styles.footer}>
@@ -99,7 +107,7 @@ let styles = StyleSheet.create({
     color: 'white',
   },
   footer: {
-    marginBottom: 20,
+    marginBottom: 60,
   },
   bss: {
     fontWeight: 'bold',
