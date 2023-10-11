@@ -49,7 +49,7 @@ export default function OnboardingScreen() {
             ),
             title: 'Connect Device',
             subtitle:
-              'Connect your SleepTracker device to the mobile application',
+              'Connect your SleepTracker device to the mobile application using wifi name: bss-sleep-detection',
           },
           {
             backgroundColor: '#000000',
