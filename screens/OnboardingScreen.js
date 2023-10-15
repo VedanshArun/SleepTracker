@@ -38,38 +38,38 @@ export default function OnboardingScreen() {
         containerStyles={{ paddingHorizontal: 15 }}
         pages={[
           {
-            backgroundColor: '#000000',
+            backgroundColor: '#ffffff',
             image: (
               <View style={styles.lottie}>
                 <Image
-                  source={require('../assets/animations/device_new.gif')}
+                  source={require('../assets/animations/device.gif')}
                   style={styles.lottie}
                 />
               </View>
             ),
             title: 'Connect Device',
             subtitle:
-              'Connect your SleepTracker device to the mobile application using wifi name: bss-sleep-detection',
+              'Connect your VigilEye device to the mobile application using wifi name: BSS_VigilEye',
           },
           {
-            backgroundColor: '#000000',
+            backgroundColor: '#ffffff',
             image: (
               <View style={styles.lottie}>
                 <Image
-                  source={require('../assets/animations/audio_new.gif')}
+                  source={require('../assets/animations/audio.gif')}
                   style={styles.lottie}
                 />
               </View>
             ),
             title: 'Customizable Alarms',
-            subtitle: 'Customize the alarms for the SleepTracker devices.',
+            subtitle: 'Customize the alarms for the VigilEye devices.',
           },
           {
-            backgroundColor: '#000000',
+            backgroundColor: '#ffffff',
             image: (
               <View style={styles.lottie}>
                 <Image
-                  source={require('../assets/animations/data_new.gif')}
+                  source={require('../assets/animations/data.gif')}
                   style={styles.lottie}
                 />
               </View>
@@ -99,6 +99,6 @@ const styles = StyleSheet.create({
     // borderBottomLeftRadius: '100%'
   },
   doneButtonText: {
-    color: '#ffffff',
+    color: '#000000',
   },
 });

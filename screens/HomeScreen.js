@@ -137,7 +137,7 @@ export default function HomeScreen() {
         </Text>
       </TouchableOpacity>
       <View style={styles.heading}>
-        <Text style={styles.text}>SleepTracker</Text>
+        <Text style={styles.text}>VigilEye</Text>
         <Text>Welcome to the dashboard</Text>
       </View>
       <View style={styles.buttonContainer}>
