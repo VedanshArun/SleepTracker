@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "BSS-SleepTracker",
-    "slug": "bss-s",
-    "version": "1.0.0",
+    "name": "VigilEye",
+    "slug": "vigileye-bss",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -30,7 +30,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#ffffff"
       },
       "package": "com.arnav.chaudhary.bsss"
     },
