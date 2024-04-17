@@ -1,5 +1,6 @@
-//const baseUrl = 'http://10.0.2.2:3081'
 const baseUrl = 'http://10.42.0.1:3000';
+
+// const baseUrl = 'http://192.168.29.231:3000';
 
 export default {
   health: async function () {
@@ -35,6 +36,27 @@ export default {
       throw error;
     }
   },
+  getCameraIp: async () => {
+    return apicall({
+      url: `${baseUrl}/camera-ip`,
+      method: 'GET',
+    });
+  },
+
+  getCameraConfig: async () => {
+    return apicall({
+      url: `${baseUrl}/env-status`,
+      method: 'GET',
+    });
+  },
+
+  setCameraConfig: async (data) => {
+    return apicall({
+      url: `${baseUrl}/update-config`,
+      method: 'POST',
+      data: data,
+    });
+  },
 };
 
 async function apicall({ method = 'POST', url, data = null }, token) {
@@ -55,6 +77,7 @@ async function apicall({ method = 'POST', url, data = null }, token) {
     }
     return resp.json();
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }

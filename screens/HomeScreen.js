@@ -4,8 +4,10 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Switch,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { VLCPlayer, VlCPlayerView } from 'react-native-vlc-media-player';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { removeItem } from '../utils/asyncStorage';
@@ -15,6 +17,7 @@ import * as FileSystem from 'expo-file-system';
 import { shareAsync } from 'expo-sharing';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as DocumentPicker from 'expo-document-picker';
+import Slider from 'react-native-slider';
 
 let { width, height } = Dimensions.get('window');
 import api from '../api';
@@ -22,8 +25,13 @@ import api from '../api';
 const baseUrl = 'http://10.42.0.1:3000';
 
 export default function HomeScreen() {
+  const video = useRef(null);
   const [deviceConnected, setDeviceConnected] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cameraIp, setCameraIp] = useState(null);
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled2, setIsEnabled2] = useState(false);
+  const [sensitivity, setSensitivity] = useState(0.25);
   let navigation = useNavigation();
 
   const downloadFromUrl = async () => {
@@ -82,11 +90,13 @@ export default function HomeScreen() {
 
   const upload = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       let response = await DocumentPicker.getDocumentAsync({
         type: '*/*',
         copyToCacheDirectory: true,
       });
+      console.log('here.......');
+      console.log(response);
       if (response.type == 'success') {
         let { name, size, uri } = response;
         let nameParts = name.split('.');
@@ -99,9 +109,11 @@ export default function HomeScreen() {
         };
         console.log(fileToUpload, '...............file');
         await api.postDocument(fileToUpload);
+        console.log('uploaded....');
         alert('Alarm uploaded successfully');
       }
     } catch (error) {
+      console.log(error);
       alert('Error uploading alarm audio. Make sure device is connected');
     } finally {
       setLoading(false);
@@ -110,10 +122,34 @@ export default function HomeScreen() {
 
   useEffect(() => {
     checkDevicePresence();
+    cameraIpAddress();
+    getCameraConfig();
     setInterval(async () => {
       await checkDevicePresence();
     }, 5000);
   }, []);
+
+  let cameraIpAddress = async () => {
+    const data = await api.getCameraIp();
+    if (data && data.devices && data.devices.ip) {
+      setCameraIp(data.devices.ip);
+    }
+  };
+
+  let getCameraConfig = async () => {
+    const { data } = await api.getCameraConfig();
+    setIsEnabled(data.invert_camera);
+    setIsEnabled2(data.camera_alarm);
+    setSensitivity(data.eye_threshold);
+  };
+
+  let setCameraConfig = async (config) => {
+    try {
+      const data = await api.setCameraConfig(config);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   let handleReset = async () => {
     await removeItem('onboarded');
@@ -138,7 +174,6 @@ export default function HomeScreen() {
       </TouchableOpacity>
       <View style={styles.heading}>
         <Text style={styles.text}>VigilEye</Text>
-        <Text>Welcome to the dashboard</Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -155,6 +190,36 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.button} onPress={downloadFromUrl}>
           <Text style={styles.buttonText}>Download Data</Text>
         </TouchableOpacity>
+        <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>
+          Sensitivity: {sensitivity}
+        </Text>
+        <View
+          style={{
+            flex: 1,
+            marginLeft: 10,
+            marginRight: 10,
+            marginBottom: 20,
+            alignItems: 'stretch',
+            justifyContent: 'center',
+          }}
+        >
+          <Slider
+            value={sensitivity}
+            minimumValue={0.2}
+            maximumValue={0.3}
+            step={0.01}
+            style={{ width: 250 }}
+            onValueChange={(value) => {
+              value = parseFloat(value.toFixed(2));
+              setCameraConfig({
+                invert_camera: isEnabled,
+                camera_alarm: isEnabled2,
+                eye_threshold: value,
+              });
+              setSensitivity(value);
+            }}
+          />
+        </View>
         {deviceConnected ? (
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Entypo name="check" size={24} color="black" />
@@ -166,11 +231,55 @@ export default function HomeScreen() {
             <Text>Device not connected!</Text>
           </View>
         )}
-      </View>
-      <View>
+        <View style={{ flexDirection: 'row', marginTop: 10 }}>
+          <Text>invert image</Text>
+          <Switch
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={async () => {
+              setCameraConfig({
+                invert_camera: !isEnabled,
+                camera_alarm: isEnabled2,
+                eye_threshold: sensitivity,
+              });
+              setIsEnabled(!isEnabled);
+            }}
+            value={isEnabled}
+          />
+          <Text style={{}}>camera alarm</Text>
+          <Switch
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={isEnabled2 ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={async () => {
+              setCameraConfig({
+                invert_camera: isEnabled,
+                camera_alarm: !isEnabled2,
+                eye_threshold: sensitivity,
+              });
+              setIsEnabled2(!isEnabled2);
+            }}
+            value={isEnabled2}
+          />
+        </View>
+        {cameraIp && (
+          <VLCPlayer
+            style={[styles.video]}
+            videoAspectRatio="16:9"
+            source={{
+              uri: `rtsp://vigileye:bone3600@${cameraIp}:554/stream1`,
+            }}
+          />
+        )}
         <Text style={styles.footer}>
           Designed at <Text style={styles.bss}>BSS</Text>
         </Text>
+      </View>
+      <View>
+        {/* <Text style={styles.footer}>
+          Designed at <Text style={styles.bss}>BSS</Text>
+        </Text> */}
       </View>
     </SafeAreaView>
   );
@@ -187,9 +296,10 @@ let styles = StyleSheet.create({
     height: width,
   },
   heading: {
-    marginTop: 60,
+    marginTop: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 60,
   },
 
   text: {
@@ -213,7 +323,7 @@ let styles = StyleSheet.create({
     backgroundColor: '#000000',
     width: 400,
     height: 50,
-    marginBottom: 40,
+    marginBottom: 30,
   },
   buttonText: {
     fontSize: 16,
@@ -223,18 +333,23 @@ let styles = StyleSheet.create({
     color: 'white',
   },
   footer: {
-    marginBottom: 60,
+    marginBottom: 10,
   },
   bss: {
     fontWeight: 'bold',
   },
   onboardingButton: {
-    marginTop: 60,
+    marginTop: 130,
   },
   onboardingBold: {
     fontWeight: 'bold',
   },
   spinnerTextStyle: {
     color: '#FFF',
+  },
+  video: {
+    alignSelf: 'center',
+    width: 320,
+    height: 200,
   },
 });
